@@ -4,6 +4,7 @@ sqlite3.verbose();
 
 const app = express();
 const port = 3000;
+app.use(express.json());
 interface SqliteError extends Error {
   code?: string;
 }
@@ -16,23 +17,6 @@ const db = new sqlite3.Database("./user.db", (err) => {
 });
 
 app.get("/", (req, res) => {
-  db.run(
-    "INSERT INTO user VALUES ('adam.hardie13@gmail.com', 'password1', 'adjash');",
-    (err: SqliteError) => {
-      if (err) {
-        if (err.code === "SQLITE_CONSTRAINT") {
-          res.status(409).send("Email already exists.");
-        } else {
-          res.status(500).send("Database error: " + err.message);
-        }
-      } else {
-        res.send("User inserted!");
-      }
-    }
-  );
-});
-
-app.get("/users", (req, res) => {
   db.all("SELECT * FROM user", (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
@@ -40,6 +24,27 @@ app.get("/users", (req, res) => {
       res.json(rows);
     }
   });
+});
+
+app.post("/register", (req, res) => {
+  if (req.body) {
+    const { email, password, username } = req.body;
+    db.run(
+      `INSERT INTO user 
+      VALUES ('${email}', '${password}', '${username}');`,
+      (err: SqliteError) => {
+        if (err) {
+          if (err.code === "SQLITE_CONSTRAINT") {
+            res.status(409).send("Email already exists.");
+          } else {
+            res.status(500).send("Database error: " + err.message);
+          }
+        } else {
+          res.send("User inserted!");
+        }
+      }
+    );
+  }
 });
 
 app.listen(port, () => {
