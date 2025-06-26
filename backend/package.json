@@ -5,6 +5,8 @@
   "scripts": {
     "start": "tsc && node dist/app.js",
     "dev": "nodemon ./src/app.ts",
+    "build": "tsc",
+    "db:build": "sqlite3 user.db < schema.sql",
     "lint": "eslint . --ext .ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -23,6 +25,7 @@
     "typescript-eslint": "^8.34.1"
   },
   "dependencies": {
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "sqlite3": "^5.1.7"
   }
 }
